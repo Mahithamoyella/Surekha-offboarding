@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  employee-offboarding:
+    container_name: surekha-employee-offboarding
+    build: ./employee-offboarding
+    ports:
+      - "8019:80"
+    networks:
+      - surekha_net
+
+  hr-offboarding:
+    container_name: surekha-hr-offboarding
+    build: ./hr-offboarding
+    ports:
+      - "8020:80"
+    networks:
+      - surekha_net
+
+  backend:
+    container_name: surekha-backend
+    build: ./Backend
+    ports:
+      - "3010:3010"
+    depends_on:
+      - postgres
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: admin834
+      DB_NAME: offboarding_db
+      DB_HOST: postgres
+      DB_PORT: 5432
+      PORT: 3010
+    networks:
+      - surekha_net
+
+  postgres:
+    container_name: surekha-postgres
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin834
+      POSTGRES_DB: offboarding_db
+    ports:
+      - "5442:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - surekha_net
+
+volumes:
+  pgdata:
+
+networks:
+  surekha_net:
+
